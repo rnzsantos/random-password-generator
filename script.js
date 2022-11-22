@@ -1,50 +1,81 @@
-const characters = [
-  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
-  "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B",
-  "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
-  "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3",
-  "4", "5", "6", "7", "8", "9", "~", "`", "!", "@", "#", "$", "%", "^",
-  "&", "*", "(", ")", "_", "-", "+", "=", "{", "[", "}", "]", ",", "|",
-  ":", ";", "<", ">", ".", "?", "/"
-];
+import characters from "./characters.js";
 
-const lengthValue = document.querySelector("#length-value");
-const lengthSelector = document.querySelector("#length-selector");
-const options = document.querySelectorAll("#option-item input");
-const generateButton = document.querySelector("#generate-btn");
-const randomPassword = document.querySelector("#random-pass-input");
-const copyIcon = document.querySelector("#copy-icon");
+/* GLOBAL VARIABLES */
+const allCharacters = {
+  lowercase: characters.slice(0, 26),
+  uppercase: characters.slice(26, 52),
+  numbers: characters.slice(52, 62),
+  symbols: characters.slice(62, 91),
+};
 
-/* Functions */
-const renderLengthValue = () => {
-  lengthValue.textContent = lengthSelector.value;
+let checkedOptions = 1;
 
-  if (lengthSelector.value <= 10) {
-    lengthValue.style.color = "#F83B3A";
-  } else if (lengthSelector.value <= 15) {
-    lengthValue.style.color = "#EBDF64";
-  } else {
-    lengthValue.style.color = "#62DE6D";
+/* QUERY SELECTORS */
+const lengthValue = document.querySelector(".pass-length__value");
+const lengthIndicator = document.querySelector(".pass-length__indicator");
+const lengthInput = document.querySelector(".pass-length__input");
+const option = document.querySelector(".option");
+const optionInputs = document.querySelectorAll(".option__item input");
+const generateButton = document.querySelector(".generate__btn");
+const randomPassword = document.querySelector(".random-pass__input");
+const copyIcon = document.querySelector(".copy-icon");
+
+/* FUNCTIONS */
+const renderLengthValue = (isTrue) => {
+  let num1, num2, classModifier;
+  isTrue ? ((num1 = 4), (num2 = 7)) : ((num1 = 10), (num2 = 15));
+
+  classModifier =
+    lengthInput.value <= num1
+      ? "weak"
+      : lengthInput.value <= num2
+      ? "good"
+      : "strong";
+
+  lengthIndicator.classList.remove(lengthIndicator.classList[1]);
+  lengthIndicator.classList.add(`pass-length__indicator--${classModifier}`);
+  lengthIndicator.textContent = classModifier;
+  lengthValue.style.color = `var(--${classModifier})`;
+  lengthValue.textContent = lengthInput.value;
+};
+renderLengthValue();
+
+const countCheckedOptions = () => {
+  optionInputs.forEach((option) => {
+    if (option.id != "duplicate" && option.checked === true) {
+      checkedOptions <= 1
+        ? (option.disabled = true)
+        : (option.disabled = false);
+    }
+  });
+};
+countCheckedOptions();
+
+const checkOptionInput = (e) => {
+  const element = e.target;
+  const checked = element.checked;
+
+  if (element.id != "duplicate" && checked === true) {
+    checkedOptions += 1;
+    generatePassword();
+  } else if (element.id != "duplicate" && checked === false) {
+    checkedOptions -= 1;
+    generatePassword();
+  } else if (element.id === "duplicate") {
+    generatePassword();
   }
+  countCheckedOptions();
 };
 
 const generatePassword = () => {
   randomPassword.value = "";
 
-  const allCharacters = {
-    lowercase: characters.slice(0, 26),
-    uppercase: characters.slice(26, 52),
-    numbers: characters.slice(52, 62),
-    symbols: characters.slice(62, 91),
-  };
-
-  let charactersArr = allCharacters.lowercase;
-  let removeDuplicate = false;
-  let randomIndex;
-  let randomCharacter;
+  let charactersArr = [];
   let passwordResult = "";
+  let removeDuplicate = false;
+  let randomIndex, randomCharacter;
 
-  options.forEach((option) => {
+  optionInputs.forEach((option) => {
     if (option.checked) {
       if (option.id != "duplicate") {
         charactersArr.push(...allCharacters[option.id]);
@@ -54,19 +85,26 @@ const generatePassword = () => {
     }
   });
 
-  for (let i = 0; i < lengthSelector.value; i++) {
+  const isTrue = removeDuplicate === true && charactersArr.length <= 10;
+  isTrue
+    ? ((lengthInput.min = 1), (lengthInput.max = 10))
+    : ((lengthInput.min = 6), (lengthInput.max = 20));
+
+  for (let i = 0; i < lengthInput.value; i++) {
     randomIndex = Math.floor(Math.random() * charactersArr.length);
     randomCharacter = charactersArr[randomIndex];
 
     if (removeDuplicate) {
       !passwordResult.includes(randomCharacter)
-      ? passwordResult += randomCharacter
-      : i--;
+        ? (passwordResult += randomCharacter)
+        : i--;
     } else {
       passwordResult += randomCharacter;
     }
     randomPassword.value = passwordResult;
   }
+
+  isTrue ? renderLengthValue(isTrue) : renderLengthValue();
 };
 
 const copyPassword = () => {
@@ -78,13 +116,11 @@ const copyPassword = () => {
   }, 1500);
 };
 
-renderLengthValue();
-
-/* Event Listeners */
-lengthSelector.addEventListener("input", () => {
+/* EVENT LISTENERS */
+lengthInput.addEventListener("input", () => {
   renderLengthValue();
   generatePassword();
 });
-
+option.addEventListener("click", checkOptionInput);
 generateButton.addEventListener("click", generatePassword);
 copyIcon.addEventListener("click", copyPassword);
