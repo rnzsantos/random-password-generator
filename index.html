@@ -5,14 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Boxicons -->
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <!-- CSS -->
     <link rel="stylesheet" href="style.css" />
     <title>Random Password Generator</title>
   </head>
   <body>
     <div class="container">
-
       <div class="title">
         <h1>
           Generate a <br />
@@ -27,28 +29,40 @@
       <div class="pass-length">
         <div class="pass-length__details">
           <p class="pass-length__text">Password Length</p>
-          <span class="pass-length__value" id="length-value"></span>
+          <span class="pass-length__value"></span>
+          <span class="pass-length__indicator pass-length__indicator--strong" />
         </div>
-        <input class="pass-length__input" type="range" min="6" max="20" step="1" id="length-selector" />
+        <input
+          class="pass-length__input"
+          type="range"
+          min="6"
+          max="20"
+          step="1"
+          value="16"
+        />
       </div>
 
       <div class="pass-option">
         <fieldset>
           <legend>Option</legend>
-          <ul class="option-list" id="option-list">
-            <li class="option-list__item" id="option-item">
+          <ul class="option">
+            <li class="option__item">
+              <input type="checkbox" id="lowercase" checked />
+              <label for="lowercase">Lowercase (a-z)</label>
+            </li>
+            <li class="option__item">
               <input type="checkbox" id="uppercase" />
               <label for="uppercase">Uppercase (A-Z)</label>
             </li>
-            <li class="option-list__item" id="option-item">
+            <li class="option__item">
               <input type="checkbox" id="numbers" />
               <label for="numbers">Numbers (0-9)</label>
             </li>
-            <li class="option-list__item" id="option-item">
+            <li class="option__item">
               <input type="checkbox" id="symbols" />
               <label for="symbols">Symbols (!@#$%)</label>
             </li>
-            <li class="option-list__item" id="option-item">
+            <li class="option__item">
               <input type="checkbox" id="duplicate" />
               <label for="duplicate">Exclude Duplicate</label>
             </li>
@@ -57,16 +71,15 @@
       </div>
 
       <div class="generate">
-        <button class="generate__btn" id="generate-btn">Generate Password</button>
+        <button class="generate__btn">Generate Password</button>
       </div>
 
       <div class="random-pass">
-        <input class="random-pass__input" type="text" id="random-pass-input" disabled />
-        <i class="bx bx-copy" id="copy-icon"></i>
+        <input class="random-pass__input" type="text" disabled />
+        <i class="copy-icon bx bx-copy"></i>
       </div>
-
     </div>
     <!-- Javascript -->
-    <script src="script.js"></script>
+    <script src="script.js" type="module"></script>
   </body>
 </html>
