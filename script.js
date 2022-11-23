@@ -11,19 +11,19 @@ const allCharacters = {
 let checkedOptions = 1;
 
 /* QUERY SELECTORS */
-const lengthValue = document.querySelector(".pass-length__value");
-const lengthIndicator = document.querySelector(".pass-length__indicator");
-const lengthInput = document.querySelector(".pass-length__input");
-const option = document.querySelector(".option");
-const optionInputs = document.querySelectorAll(".option__item input");
-const generateButton = document.querySelector(".generate__btn");
-const randomPassword = document.querySelector(".random-pass__input");
-const copyIcon = document.querySelector(".copy-icon");
+const lengthValue = document.querySelector(".pass-length__value"),
+  lengthIndicator = document.querySelector(".pass-length__indicator"),
+  lengthInput = document.querySelector(".pass-length__input"),
+  option = document.querySelector(".option"),
+  optionInputs = document.querySelectorAll(".option__item input"),
+  generateButton = document.querySelector(".generate__btn"),
+  randomPassword = document.querySelector(".random-pass__input"),
+  copyIcon = document.querySelector(".copy-icon");
 
 /* FUNCTIONS */
 const renderLengthValue = (isTrue) => {
-  let num1, num2, classModifier;
-  isTrue ? ((num1 = 4), (num2 = 7)) : ((num1 = 10), (num2 = 15));
+  let [num1, num2, classModifier] = [10, 15];
+  if (isTrue) (num1 = 4), (num2 = 7);
 
   classModifier =
     lengthInput.value <= num1
@@ -42,26 +42,22 @@ renderLengthValue();
 
 const countCheckedOptions = () => {
   optionInputs.forEach((option) => {
-    if (option.id != "duplicate" && option.checked === true) {
-      checkedOptions <= 1
-        ? (option.disabled = true)
-        : (option.disabled = false);
-    }
+    if (option.id != "duplicate" && option.checked)
+      option.disabled = checkedOptions <= 1 ? true : false;
   });
 };
 countCheckedOptions();
 
 const checkOptionInput = (e) => {
-  const element = e.target;
-  const checked = element.checked;
+  const [elementId, isChecked] = [e.target.id, e.target.checked];
 
-  if (element.id != "duplicate" && checked === true) {
+  if (elementId != "duplicate" && isChecked === true) {
     checkedOptions += 1;
     generatePassword();
-  } else if (element.id != "duplicate" && checked === false) {
+  } else if (elementId != "duplicate" && isChecked === false) {
     checkedOptions -= 1;
     generatePassword();
-  } else if (element.id === "duplicate") {
+  } else if (elementId === "duplicate") {
     generatePassword();
   }
   countCheckedOptions();
@@ -70,37 +66,35 @@ const checkOptionInput = (e) => {
 const generatePassword = () => {
   randomPassword.value = "";
 
-  let charactersArr = [];
-  let passwordResult = "";
-  let removeDuplicate = false;
-  let randomIndex, randomCharacter;
+  let [
+    charactersArr,
+    passwordResult,
+    removeDuplicate,
+    randomIndex,
+    randomCharacter,
+  ] = [[], "", false];
 
   optionInputs.forEach((option) => {
-    if (option.checked) {
-      if (option.id != "duplicate") {
-        charactersArr.push(...allCharacters[option.id]);
-      } else {
-        removeDuplicate = true;
-      }
-    }
+    if (option.checked)
+      option.id != "duplicate"
+        ? charactersArr.push(...allCharacters[option.id])
+        : (removeDuplicate = true);
   });
 
-  const isTrue = removeDuplicate === true && charactersArr.length <= 10;
-  isTrue
-    ? ((lengthInput.min = 1), (lengthInput.max = 10))
-    : ((lengthInput.min = 6), (lengthInput.max = 20));
+  const isTrue = removeDuplicate && charactersArr.length <= 10;
+  lengthInput.min = isTrue ? 1 : 6;
+  lengthInput.max = isTrue ? 10 : 20;
 
   for (let i = 0; i < lengthInput.value; i++) {
     randomIndex = Math.floor(Math.random() * charactersArr.length);
     randomCharacter = charactersArr[randomIndex];
 
-    if (removeDuplicate) {
-      !passwordResult.includes(randomCharacter)
+    removeDuplicate
+      ? !passwordResult.includes(randomCharacter)
         ? (passwordResult += randomCharacter)
-        : i--;
-    } else {
-      passwordResult += randomCharacter;
-    }
+        : i--
+      : (passwordResult += randomCharacter);
+
     randomPassword.value = passwordResult;
   }
 
