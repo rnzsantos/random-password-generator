@@ -1,3 +1,5 @@
+"use strict";
+
 import characters from "./characters.js";
 
 /* GLOBAL VARIABLES */
