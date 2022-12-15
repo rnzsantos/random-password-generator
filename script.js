@@ -1,122 +1,127 @@
 "use strict";
 
-import characters from "./characters.js";
+import allCharacters from "./characters.js";
 
-/* GLOBAL VARIABLES */
-const allCharacters = {
-  lowercase: characters.slice(0, 26),
-  uppercase: characters.slice(26, 52),
-  numbers: characters.slice(52, 62),
-  symbols: characters.slice(62, 91),
-};
+/* SELECTORS */
+const lengthText = document.querySelector(".pass-length__value");
+const lengthIndicator = document.querySelector(".pass-length__indicator");
+const lengthInput = document.querySelector(".pass-length__input");
+const option = document.querySelector(".option");
+const optionInputs = document.querySelectorAll(".option__item input");
+const generateButton = document.querySelector(".generate__btn");
+const randomPassword = document.querySelector(".random-pass__input");
+const copyButton = document.querySelector(".copy-icon");
 
-let checkedOptions = 1;
-
-/* QUERY SELECTORS */
-const lengthValue = document.querySelector(".pass-length__value"),
-  lengthIndicator = document.querySelector(".pass-length__indicator"),
-  lengthInput = document.querySelector(".pass-length__input"),
-  option = document.querySelector(".option"),
-  optionInputs = document.querySelectorAll(".option__item input"),
-  generateButton = document.querySelector(".generate__btn"),
-  randomPassword = document.querySelector(".random-pass__input"),
-  copyIcon = document.querySelector(".copy-icon");
+/* EVENT LISTENERS */
+lengthInput.addEventListener("input", updateAndRender);
+option.addEventListener("change", disableUpdateAndRender);
+generateButton.addEventListener("click", renderPassword);
+copyButton.addEventListener("click", copyPassword);
 
 /* FUNCTIONS */
-const renderLengthValue = (isTrue) => {
-  let [num1, num2, classModifier] = [10, 15];
-  if (isTrue) (num1 = 4), (num2 = 7);
+function updateAndRender() {
+  updateInputValue();
+  updateLengthText();
+  updateIndicator();
+  renderPassword();
+}
 
-  classModifier =
-    lengthInput.value <= num1
+function disableUpdateAndRender() {
+  disableOption();
+  updateAndRender();
+}
+
+function updateInputValue() {
+  const excludeDuplicate = checkDuplicateOption();
+  const passwordLength = filterCharacters().length;
+  lengthInput.min = !excludeDuplicate ? 6 : passwordLength < 11 ? 1 : 6;
+  lengthInput.max = !excludeDuplicate ? 20 : passwordLength < 11 ? 10 : 20;
+}
+
+function updateLengthText() {
+  lengthText.textContent = lengthInput.value;
+}
+
+function updateIndicator() {
+  const excludeDuplicate = checkDuplicateOption();
+  const passwordLength = filterCharacters().length;
+  const num1 = excludeDuplicate && passwordLength < 11 ? 5 : 11;
+  const num2 = excludeDuplicate && passwordLength < 11 ? 8 : 16;
+
+  const strengthModifier =
+    lengthInput.value < num1
       ? "weak"
-      : lengthInput.value <= num2
+      : lengthInput.value < num2
       ? "good"
       : "strong";
 
   lengthIndicator.classList.remove(lengthIndicator.classList[1]);
-  lengthIndicator.classList.add(`pass-length__indicator--${classModifier}`);
-  lengthIndicator.textContent = classModifier;
-  lengthValue.style.color = `var(--${classModifier})`;
-  lengthValue.textContent = lengthInput.value;
-};
-renderLengthValue();
+  lengthIndicator.classList.add(`pass-length__indicator--${strengthModifier}`);
+  lengthIndicator.textContent = strengthModifier;
+}
 
-const countCheckedOptions = () => {
-  optionInputs.forEach((option) => {
-    if (option.id != "duplicate" && option.checked)
-      option.disabled = checkedOptions <= 1 ? true : false;
-  });
-};
-countCheckedOptions();
+function renderPassword() {
+  randomPassword.value = getPassword();
+}
 
-const checkOptionInput = (e) => {
-  const [elementId, isChecked] = [e.target.id, e.target.checked];
+function getPassword() {
+  const excludeDuplicate = checkDuplicateOption();
+  const characters = filterCharacters();
 
-  if (elementId != "duplicate" && isChecked === true) {
-    checkedOptions += 1;
-    generatePassword();
-  } else if (elementId != "duplicate" && isChecked === false) {
-    checkedOptions -= 1;
-    generatePassword();
-  } else if (elementId === "duplicate") {
-    generatePassword();
-  }
-  countCheckedOptions();
-};
-
-const generatePassword = () => {
-  randomPassword.value = "";
-
-  let [
-    charactersArr,
-    passwordResult,
-    removeDuplicate,
-    randomIndex,
-    randomCharacter,
-  ] = [[], "", false];
-
-  optionInputs.forEach((option) => {
-    if (option.checked)
-      option.id != "duplicate"
-        ? charactersArr.push(...allCharacters[option.id])
-        : (removeDuplicate = true);
-  });
-
-  const isTrue = removeDuplicate && charactersArr.length <= 10;
-  lengthInput.min = isTrue ? 1 : 6;
-  lengthInput.max = isTrue ? 10 : 20;
+  let password = "";
 
   for (let i = 0; i < lengthInput.value; i++) {
-    randomIndex = Math.floor(Math.random() * charactersArr.length);
-    randomCharacter = charactersArr[randomIndex];
+    const randomIndex = Math.floor(Math.random() * characters.length);
 
-    removeDuplicate
-      ? !passwordResult.includes(randomCharacter)
-        ? (passwordResult += randomCharacter)
-        : i--
-      : (passwordResult += randomCharacter);
-
-    randomPassword.value = passwordResult;
+    if (excludeDuplicate)
+      password.includes(characters[randomIndex])
+        ? i--
+        : (password += characters[randomIndex]);
+    else password += characters[randomIndex];
   }
 
-  isTrue ? renderLengthValue(isTrue) : renderLengthValue();
-};
+  return password;
+}
 
-const copyPassword = () => {
+function filterCharacters() {
+  let allIncludedCharacters = "";
+
+  for (let option of optionInputs)
+    if (option.checked && option.id !== "duplicate")
+      allIncludedCharacters += allCharacters[option.id].join("");
+
+  return allIncludedCharacters;
+}
+
+function checkDuplicateOption() {
+  let excludeDuplicate = false;
+
+  for (let option of optionInputs)
+    if (option.checked && option.id === "duplicate") excludeDuplicate = true;
+
+  return excludeDuplicate;
+}
+
+function disableOption() {
+  const checkedOptions = countCheckedOptions();
+
+  for (let option of optionInputs)
+    if (option.checked && option.id !== "duplicate")
+      option.disabled = checkedOptions < 2 ? true : false;
+}
+
+function countCheckedOptions() {
+  let checkedOptions = 0;
+  for (let option of optionInputs)
+    if (option.checked && option.id !== "duplicate") checkedOptions += 1;
+
+  return checkedOptions;
+}
+
+function copyPassword() {
   navigator.clipboard.writeText(randomPassword.value);
-  copyIcon.classList.replace("bx-copy", "bx-check");
+  copyButton.classList.replace("bx-copy", "bx-check");
+  setTimeout(() => copyButton.classList.replace("bx-check", "bx-copy"), 500);
+}
 
-  setTimeout(() => {
-    copyIcon.classList.replace("bx-check", "bx-copy");
-  }, 1500);
-};
-
-/* EVENT LISTENERS */
-lengthInput.addEventListener("input", () => {
-  renderLengthValue();
-  generatePassword();
-});
-option.addEventListener("click", checkOptionInput);
-generateButton.addEventListener("click", generatePassword);
-copyIcon.addEventListener("click", copyPassword);
+renderPassword();

@@ -92,4 +92,11 @@ const characters = [
   "/",
 ];
 
-export default characters;
+const allCharacters = {
+  lowercase: characters.slice(0, 26),
+  uppercase: characters.slice(26, 52),
+  numbers: characters.slice(52, 62),
+  symbols: characters.slice(62, 91),
+};
+
+export default allCharacters;
