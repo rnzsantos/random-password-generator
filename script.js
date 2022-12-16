@@ -8,6 +8,7 @@ const lengthIndicator = document.querySelector(".pass-length__indicator");
 const lengthInput = document.querySelector(".pass-length__input");
 const option = document.querySelector(".option");
 const optionInputs = document.querySelectorAll(".option__item input");
+const isDuplicate = document.querySelector("#duplicate");
 const generateButton = document.querySelector(".generate__btn");
 const randomPassword = document.querySelector(".random-pass__input");
 const copyButton = document.querySelector(".copy-icon");
@@ -32,10 +33,10 @@ function disableUpdateAndRender() {
 }
 
 function updateInputValue() {
-  const excludeDuplicate = checkDuplicateOption();
   const passwordLength = filterCharacters().length;
-  lengthInput.min = !excludeDuplicate ? 6 : passwordLength < 11 ? 1 : 6;
-  lengthInput.max = !excludeDuplicate ? 20 : passwordLength < 11 ? 10 : 20;
+  const isTrue = isDuplicate.checked && passwordLength < 11;
+  lengthInput.min = isTrue ? 1 : 6;
+  lengthInput.max = isTrue ? 10 : 20;
 }
 
 function updateLengthText() {
@@ -43,10 +44,10 @@ function updateLengthText() {
 }
 
 function updateIndicator() {
-  const excludeDuplicate = checkDuplicateOption();
   const passwordLength = filterCharacters().length;
-  const num1 = excludeDuplicate && passwordLength < 11 ? 5 : 11;
-  const num2 = excludeDuplicate && passwordLength < 11 ? 8 : 16;
+  const isTrue = isDuplicate.checked && passwordLength < 11;
+  const num1 = isTrue ? 5 : 11;
+  const num2 = isTrue ? 8 : 16;
 
   const strengthModifier =
     lengthInput.value < num1
@@ -65,18 +66,15 @@ function renderPassword() {
 }
 
 function getPassword() {
-  const excludeDuplicate = checkDuplicateOption();
   const characters = filterCharacters();
-
   let password = "";
 
   for (let i = 0; i < lengthInput.value; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
+    const doesInclude = password.includes(characters[randomIndex]);
 
-    if (excludeDuplicate)
-      password.includes(characters[randomIndex])
-        ? i--
-        : (password += characters[randomIndex]);
+    if (isDuplicate.checked)
+      doesInclude ? i-- : (password += characters[randomIndex]);
     else password += characters[randomIndex];
   }
 
@@ -84,37 +82,29 @@ function getPassword() {
 }
 
 function filterCharacters() {
-  let allIncludedCharacters = "";
+  let characters = "";
 
-  for (let option of optionInputs)
-    if (option.checked && option.id !== "duplicate")
-      allIncludedCharacters += allCharacters[option.id].join("");
+  optionInputs.forEach((option) => {
+    if (option.checked) characters += allCharacters[option.id].join("");
+  });
 
-  return allIncludedCharacters;
-}
-
-function checkDuplicateOption() {
-  let excludeDuplicate = false;
-
-  for (let option of optionInputs)
-    if (option.checked && option.id === "duplicate") excludeDuplicate = true;
-
-  return excludeDuplicate;
+  return characters;
 }
 
 function disableOption() {
   const checkedOptions = countCheckedOptions();
 
-  for (let option of optionInputs)
-    if (option.checked && option.id !== "duplicate")
-      option.disabled = checkedOptions < 2 ? true : false;
+  optionInputs.forEach((option) => {
+    if (option.checked) option.disabled = checkedOptions < 2 ? true : false;
+  });
 }
 
 function countCheckedOptions() {
   let checkedOptions = 0;
 
-  for (let option of optionInputs)
-    if (option.checked && option.id !== "duplicate") checkedOptions++;
+  optionInputs.forEach((option) => {
+    if (option.checked) checkedOptions++;
+  });
 
   return checkedOptions;
 }
