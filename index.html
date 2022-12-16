@@ -14,23 +14,25 @@
     <title>Random Password Generator</title>
   </head>
   <body>
-    <div class="container">
-      <div class="title">
+    <main class="container">
+      <header class="title">
         <h1>
           Generate a <br />
           <span>random password</span>
         </h1>
         <h4>Never use an insecure password again.</h4>
-      </div>
+      </header>
 
       <hr />
       <br />
 
-      <div class="pass-length">
+      <section class="pass-length">
         <div class="pass-length__details">
           <p class="pass-length__text">Password Length</p>
           <span class="pass-length__value">20</span>
-          <span class="pass-length__indicator pass-length__indicator--strong">strong</span>
+          <span class="pass-length__indicator pass-length__indicator--strong"
+            >strong</span
+          >
         </div>
         <input
           class="pass-length__input"
@@ -40,9 +42,9 @@
           step="1"
           value="20"
         />
-      </div>
+      </section>
 
-      <div class="pass-option">
+      <section class="pass-option">
         <fieldset>
           <legend>Option</legend>
           <ul class="option">
@@ -68,17 +70,17 @@
             </li>
           </ul>
         </fieldset>
-      </div>
+      </section>
 
-      <div class="generate">
+      <section class="generate">
         <button class="generate__btn">Generate Password</button>
-      </div>
+      </section>
 
-      <div class="random-pass">
+      <footer class="random-pass">
         <input class="random-pass__input" type="text" disabled />
         <i class="copy-icon bx bx-copy"></i>
-      </div>
-    </div>
+      </footer>
+    </main>
     <!-- Javascript -->
     <script src="script.js" type="module"></script>
   </body>
