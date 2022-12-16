@@ -112,8 +112,9 @@ function disableOption() {
 
 function countCheckedOptions() {
   let checkedOptions = 0;
+
   for (let option of optionInputs)
-    if (option.checked && option.id !== "duplicate") checkedOptions += 1;
+    if (option.checked && option.id !== "duplicate") checkedOptions++;
 
   return checkedOptions;
 }
