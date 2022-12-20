@@ -3,11 +3,10 @@
 import allCharacters from "./characters.js";
 
 /* SELECTORS */
-const lengthText = document.querySelector(".pass-length__value");
 const lengthIndicator = document.querySelector(".pass-length__indicator");
 const lengthInput = document.querySelector(".pass-length__input");
 const option = document.querySelector(".option");
-const optionInputs = document.querySelectorAll(".option__item input");
+const optionInputs = document.querySelectorAll(".option__item .option-input");
 const isDuplicate = document.querySelector("#duplicate");
 const generateButton = document.querySelector(".generate__btn");
 const randomPassword = document.querySelector(".random-pass__input");
@@ -40,7 +39,7 @@ function updateInputValue() {
 }
 
 function updateLengthText() {
-  lengthText.textContent = lengthInput.value;
+  document.querySelector(".pass-length__value").textContent = lengthInput.value;
 }
 
 function updateIndicator() {
